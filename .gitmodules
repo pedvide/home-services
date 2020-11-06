@@ -1,0 +1,3 @@
+[submodule "home_sensor"]
+	path = home_sensor
+	url = git@github.com:pedvide/home_sensor.git
