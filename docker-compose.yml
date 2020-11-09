@@ -15,3 +15,23 @@ services:
     networks: 
       - influxdb
     user: "${INFLUX_UID}:${INFLUX_GID}"
+
+  telegraf:
+    build:
+      context: ./telegraf/telegraf-monitoring 
+      dockerfile: telegraf-monitoring.Dockerfile
+    environment:
+      - HOST_HOSTNAME=${TELEGRAF_HOSTNAME}
+      - HOST_MOUNT_PREFIX=/hostfs
+      - HOST_PROC=/hostfs/proc  
+      - HOST_SYS=/hostfs/sys 
+      - HOST_VAR=/hostfs/var 
+    volumes:
+      - /:/hostfs:ro 
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /etc/telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+    networks: 
+      - influxdb
+    user: "${TELEGRAF_UID}:${TELEGRAF_GID}"
+    depends_on:
+      - influxdb
