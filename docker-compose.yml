@@ -14,7 +14,7 @@ services:
       - "8086:8086"
     networks: 
       - influxdb
-    user: "${INFLUX_UID}:${INFLUX_GID}"
+    user: "${INFLUX_UID}":"${INFLUX_GID}"
 
   telegraf:
     build:
@@ -32,6 +32,23 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     networks: 
       - influxdb
-    user: "${TELEGRAF_UID}:${TELEGRAF_GID}"
+    user: "${TELEGRAF_UID}":"${TELEGRAF_GID}"
     depends_on:
       - influxdb
+
+  grafana:
+    iamge: grafana/grafana
+    environment:
+      - GF_DISABLE_INITIAL_ADMIN_CREATION=true 
+      - GF_SECURITY_ADMIN_USER=admin 
+      - GF_SECURITY_ADMIN_PASSWORD=grafana123 
+      - GF_DATE_FORMATS_INTERVAL_DAY='DD/MM' 
+      - GF_DATE_FORMATS_INTERVAL_HOUR='DD/MM HH:mm' 
+    volumes:
+      - /var/lib/grafana/:/var/lib/grafana
+    networks: 
+      - influxdb
+    user: "${GRAFANA_UID}:${GRAFANA_GID}"
+    depends_on:
+      - influxdb
+      - telegraf

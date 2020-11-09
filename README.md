@@ -154,8 +154,11 @@ docker run -d --name=grafana -p 3000:3000 --net influxdb \
 ## Setup
 
 Go to hostname:3000.
-
 Use admin:grafana123 to log in.
+
+
+Add a new data source of type Influxdb, set the URL as "http://influxdb:8086".
+Add the influxdb username and passwords (influx_admin, influx_admin123) and the database: telegraf, with credentials telegraf and telegraf123:
 
 ```bash
 curl -d '{
@@ -173,7 +176,3 @@ curl -d '{
 "password": "telegraf123",
 }' http://admin:grafana123@localhost:3000/api/datasources
 ```
-
-Add a new data source of type Influxdb, set the URL as "http://influxdb:8086".
-
-Add the influxdb username and passwords (influx_admin, influx_admin123) and the database: telegraf, with credentials telegraf and telegraf123.
