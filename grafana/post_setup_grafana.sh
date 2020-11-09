@@ -1,7 +1,7 @@
 #!/bin/bash
 
-curl -d '{
-"name": "InfluxDB_telegraf",
+curl --header "Content-Type: application/json" \ -X POST --data \
+'{"name":"InfluxDB_telegraf",
 "type": "influxdb",
 "access": "proxy",
 "url": "http://influxdb:8086",
@@ -12,5 +12,5 @@ curl -d '{
 },
 "database": "telegraf",
 "user": "telegraf",
-"password": "telegraf123",
-}' http://admin:grafana123@localhost:3000/api/datasources
+"password": "telegraf123"
+}' http://admin:grafana123@localhost:3000/api/datasources | jq
