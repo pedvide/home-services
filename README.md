@@ -62,23 +62,18 @@ docker network create telegraf
 
 ```bash
 sudo useradd -rs /bin/false telegraf
-sudo mkdir -p /etc/telegraf
-docker run --rm telegraf telegraf config | sudo tee /etc/telegraf/telegraf.conf > /dev/null
-sudo chown telegraf:telegraf /etc/telegraf/*
 ```
 
-Edit the telegraf config file:
+Inportant parts of the telegraf config file:
 
-```bash
-sudo vim /etc/telegraf/telegraf.conf
-```
+````
 
 In the section [[outputs.influxdb]], change "HTTP Basic Auth" to:
 
 ```cfg
 username = "telegraf"
 password = "telegraf123"
-```
+````
 
 And change url to
 
@@ -96,12 +91,12 @@ hostname = "$HOST_HOSTNAME"
 
 `sudo usermod -aG docker telegraf`
 
-Uncomment the [[inputs.docker]]
+See the [[inputs.docker]]
 and the endpoint setting.
 
 #### CPU temp and net monitoring
 
-Uncomment [[inputs.sensors]], and [[inputs.net]] and `sudo apt install lm-sensors`.
+See [[inputs.sensors]], and [[inputs.net]] and `sudo apt install lm-sensors`.
 
 ### Create database and user on influxdb
 
@@ -111,12 +106,6 @@ curl -POST -u influx_admin:influx_admin123 http://localhost:8086/query \
 ```
 
 ### Run container
-
-Build the telegraf-monitoring image in the folder with the Dockerfile.telegraf-monitoring:
-
-```bash
-docker build -t telegraf-monitoring .
-```
 
 Use the docker gid to be able to access the docker socket
 
@@ -129,7 +118,7 @@ docker run -d --user "$(id -u telegraf)":"$(getent group docker | cut -d: -f3)" 
  -e HOST_SYS=/hostfs/sys \
  -e HOST_VAR=/hostfs/var \
  -v /var/run/docker.sock:/var/run/docker.sock \
- -v /etc/telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro \
+ -v $(pwd)/telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro \
  telegraf-monitoring
 
 docker network connect telegraf telegraf
