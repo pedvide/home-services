@@ -12,8 +12,5 @@ RUN apk add --no-cache ca-certificates tar tzdata wget \
     && chmod +x speedtest && mv speedtest /usr/bin/speedtest
 
 RUN speedtest --accept-gdpr --accept-license
-#CMD shell2http -cgi / 'echo "Content-Type: application/json"; echo; echo "{\"date\": \"$(date)\"}"'
-ENV SPEEDTEST="speedtest --accept-license --accept-gdpr -f json 2> /dev/null"
-#CMD ./shell2http -cgi / 'echo "Content-Type: application/json\n"; echo $(${SPEEDTEST})'
-CMD ["-cgi", "/", "echo \"Content-Type: application/json\n\"; speedtest --accept-license --accept-gdpr -f json 2> /dev/null"]
 
+CMD ["-cgi", "/", "echo \"Content-Type: application/json\n\"; speedtest --accept-license --accept-gdpr -f json 2> /dev/null"]

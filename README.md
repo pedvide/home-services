@@ -54,6 +54,12 @@ See `docker-compose.yml` and `telegraf/setup_telegraf.sh` or:
 
 ### Create user, settings, and folders
 
+Create network:
+
+```bash
+docker network create telegraf
+```
+
 ```bash
 sudo useradd -rs /bin/false telegraf
 sudo mkdir -p /etc/telegraf
@@ -125,6 +131,8 @@ docker run -d --user "$(id -u telegraf)":"$(getent group docker | cut -d: -f3)" 
  -v /var/run/docker.sock:/var/run/docker.sock \
  -v /etc/telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro \
  telegraf-monitoring
+
+docker network connect telegraf telegraf
 ```
 
 ### Test
@@ -182,4 +190,18 @@ curl -d '{
 "user": "telegraf",
 "password": "telegraf123",
 }' http://admin:grafana123@localhost:3000/api/datasources
+```
+
+## speedtest
+
+Build image
+
+```bash
+docker build -t speedtest -f speedtest.Dockerfile .
+```
+
+Run:
+
+```bash
+docker run -d --name speedtest --net telegraf speedtest
 ```

@@ -1,6 +1,7 @@
 version: "3.8"
 networks:
   influxdb:
+  telegraf:
 
 services:
   influxdb:
@@ -17,9 +18,7 @@ services:
     user: "${INFLUX_UID}:${INFLUX_GID}"
 
   telegraf:
-    build:
-      context: ./telegraf/telegraf-monitoring
-      dockerfile: telegraf-monitoring.Dockerfile
+    image: telegraf
     environment:
       - HOST_HOSTNAME=${TELEGRAF_HOSTNAME}
       - HOST_MOUNT_PREFIX=/hostfs
@@ -28,13 +27,23 @@ services:
       - HOST_VAR=/hostfs/var
     volumes:
       - /:/hostfs:ro
-      - ./telegraf/telegraf-monitoring/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+      - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - influxdb
+      - telegraf
     user: "${TELEGRAF_UID}:${TELEGRAF_GID}"
     depends_on:
       - influxdb
+
+  speedtest:
+    build:
+      context: ./speedtest
+      dockerfile: speedtest.Dockerfile
+    networks:
+      - telegraf
+    depends_on:
+      - telegraf
 
   grafana:
     image: grafana/grafana
