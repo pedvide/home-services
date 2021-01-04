@@ -1,7 +1,7 @@
 version: "3.8"
 networks:
   influxdb:
-   
+
 services:
   influxdb:
     image: influxdb
@@ -12,25 +12,25 @@ services:
       - /var/lib/influxdb:/var/lib/influxdb
     ports:
       - "8086:8086"
-    networks: 
+    networks:
       - influxdb
     user: "${INFLUX_UID}:${INFLUX_GID}"
 
   telegraf:
     build:
-      context: ./telegraf/telegraf-monitoring 
+      context: ./telegraf/telegraf-monitoring
       dockerfile: telegraf-monitoring.Dockerfile
     environment:
       - HOST_HOSTNAME=${TELEGRAF_HOSTNAME}
       - HOST_MOUNT_PREFIX=/hostfs
-      - HOST_PROC=/hostfs/proc  
-      - HOST_SYS=/hostfs/sys 
-      - HOST_VAR=/hostfs/var 
+      - HOST_PROC=/hostfs/proc
+      - HOST_SYS=/hostfs/sys
+      - HOST_VAR=/hostfs/var
     volumes:
-      - /:/hostfs:ro 
+      - /:/hostfs:ro
       - ./telegraf/telegraf-monitoring/telegraf.conf:/etc/telegraf/telegraf.conf:ro
       - /var/run/docker.sock:/var/run/docker.sock
-    networks: 
+    networks:
       - influxdb
     user: "${TELEGRAF_UID}:${TELEGRAF_GID}"
     depends_on:
@@ -39,16 +39,16 @@ services:
   grafana:
     image: grafana/grafana
     environment:
-      - GF_DISABLE_INITIAL_ADMIN_CREATION=true 
-      - GF_SECURITY_ADMIN_USER=admin 
-      - GF_SECURITY_ADMIN_PASSWORD=grafana123 
-      - GF_DATE_FORMATS_INTERVAL_DAY='DD/MM' 
-      - GF_DATE_FORMATS_INTERVAL_HOUR='DD/MM HH:mm' 
+      - GF_DISABLE_INITIAL_ADMIN_CREATION=true
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=grafana123
+      - GF_DATE_FORMATS_INTERVAL_DAY='DD/MM'
+      - GF_DATE_FORMATS_INTERVAL_HOUR='DD/MM HH:mm'
     volumes:
       - /var/lib/grafana/:/var/lib/grafana
     ports:
       - "3000:3000"
-    networks: 
+    networks:
       - influxdb
     user: "${GRAFANA_UID}:${GRAFANA_GID}"
     depends_on:
