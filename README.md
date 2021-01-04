@@ -1,9 +1,13 @@
-# InfluxDB
+# Docker services
 
 Avoid having to use sudo all the time with docker:
 `sudo usermod -aG docker pedvide`
 
-## Create user, settings, and folders
+## InfluxDB
+
+See `docker-compose.yml` and `influxdb/setup_influxdb.sh` or:
+
+### Create user, settings, and folders
 
 ```bash
 sudo useradd -rs /bin/false influxdb
@@ -11,20 +15,20 @@ sudo mkdir -p /var/lib/influxdb
 sudo chown influxdb:influxdb /var/lib/influxdb/
 ```
 
-## Create admin account
+### Create admin account
 
 ```bash
 docker run --rm -e INFLUXDB_HTTP_AUTH_ENABLED=true \
-	-e INFLUXDB_ADMIN_USER=influx_admin -e INFLUXDB_ADMIN_PASSWORD=influx_admin123 \
-	-v /var/lib/influxdb:/var/lib/influxdb \
-	influxdb /init-influxdb.sh
+ -e INFLUXDB_ADMIN_USER=influx_admin -e INFLUXDB_ADMIN_PASSWORD=influx_admin123 \
+ -v /var/lib/influxdb:/var/lib/influxdb \
+ influxdb /init-influxdb.sh
 ```
 
-## Create network
+### Create network
 
 `docker network create influxdb`
 
-## Run container
+### Run container
 
 ```bash
 docker run -d -p 8086:8086 --net influxdb \
@@ -36,7 +40,7 @@ docker run -d -p 8086:8086 --net influxdb \
  influxdb
 ```
 
-## Test
+### Test
 
 Test the database:
 
@@ -44,9 +48,11 @@ Test the database:
 curl -G -u influx_admin:influx_admin123 http://localhost:8086/query --data-urlencode "q=SHOW DATABASES" | jq
 ```
 
-# Telegraf
+## Telegraf
 
-## Create user, settings, and folders
+See `docker-compose.yml` and `telegraf/setup_telegraf.sh` or:
+
+### Create user, settings, and folders
 
 ```bash
 sudo useradd -rs /bin/false telegraf
@@ -57,48 +63,48 @@ sudo chown telegraf:telegraf /etc/telegraf/*
 
 Edit the telegraf config file:
 
-```
+```bash
 sudo vim /etc/telegraf/telegraf.conf
 ```
 
 In the section [[outputs.influxdb]], change "HTTP Basic Auth" to:
 
-```
+```cfg
 username = "telegraf"
 password = "telegraf123"
 ```
 
 And change url to
 
-```
+```cfg
 urls = ["http://influxdb:8086"]
 ```
 
 In the [agent] section change hostname:
 
-```
+```cfg
 hostname = "$HOST_HOSTNAME"
 ```
 
-### Docker monitoring
+#### Docker monitoring
 
 `sudo usermod -aG docker telegraf`
 
 Uncomment the [[inputs.docker]]
 and the endpoint setting.
 
-### CPU temp and net monitoring
+#### CPU temp and net monitoring
 
 Uncomment [[inputs.sensors]], and [[inputs.net]] and `sudo apt install lm-sensors`.
 
-## Create database and user on influxdb
+### Create database and user on influxdb
 
 ```bash
 curl -POST -u influx_admin:influx_admin123 http://localhost:8086/query \
 --data-urlencode "q=CREATE DATABASE telegraf WITH DURATION 30d SHARD DURATION 1d NAME "monthly"; CREATE USER "telegraf" WITH PASSWORD 'telegraf123'; GRANT ALL ON "telegraf" TO "telegraf""
 ```
 
-## Run container
+### Run container
 
 Build the telegraf-monitoring image in the folder with the Dockerfile.telegraf-monitoring:
 
@@ -121,16 +127,18 @@ docker run -d --user "$(id -u telegraf)":"$(getent group docker | cut -d: -f3)" 
  telegraf-monitoring
 ```
 
-## Test
+### Test
 
 ```bash
 curl -G -u influx_admin:influx_admin123 http://localhost:8086/query
-	--data-urlencode "q=SELECT * FROM telegraf.autogen.cpu LIMIT 1" | jq
+ --data-urlencode "q=SELECT * FROM telegraf.autogen.cpu LIMIT 1" | jq
 ```
 
-# Grafana
+## Grafana
 
-## Setup
+See `docker-compose.yml` and `grafana/setup_grafana.sh` or:
+
+### Setup
 
 ```bash
 sudo useradd -rs /bin/false grafana
@@ -138,7 +146,7 @@ sudo mkdir -p /var/lib/grafana
 sudo chown grafana:grafana /var/lib/grafana
 ```
 
-## Run container
+### Run container
 
 ```bash
 docker run -d --name=grafana -p 3000:3000 --net influxdb \
@@ -151,11 +159,10 @@ docker run -d --name=grafana -p 3000:3000 --net influxdb \
  grafana/grafana
 ```
 
-## Setup
+### Setup
 
 Go to hostname:3000.
 Use admin:grafana123 to log in.
-
 
 Add a new data source of type Influxdb, set the URL as "http://influxdb:8086".
 Add the influxdb username and passwords (influx_admin, influx_admin123) and the database: telegraf, with credentials telegraf and telegraf123:
