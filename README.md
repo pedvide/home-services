@@ -192,5 +192,5 @@ docker build -t speedtest -f speedtest.Dockerfile .
 Run:
 
 ```bash
-docker run -d --name speedtest --net telegraf speedtest
+docker run -d --restart=always --name speedtest --net telegraf speedtest
 ```
