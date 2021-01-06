@@ -69,5 +69,6 @@ services:
     environment:
       - TZ=Europe/Amsterdam
       - SUBDOMAINS=pedvide
-      - TOKEN=709d04ac-8097-4bba-9047-52180af896b3
+      # TOKEN=$(cat duckdns/token | tr -d "\n")
+      - TOKEN
     restart: unless-stopped

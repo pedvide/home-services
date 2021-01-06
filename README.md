@@ -201,7 +201,7 @@ docker run -d --restart=unless-stopped --name speedtest --net telegraf speedtest
 docker run -d --name=duckdns \
   -e TZ=Europe/Amsterdam \
   -e SUBDOMAINS=pedvide \
-  -e TOKEN=709d04ac-8097-4bba-9047-52180af896b3 \
+  -e TOKEN=$(cat duckdns/token | tr -d "\n") \
   --restart unless-stopped \
   ghcr.io/linuxserver/duckdns
 ```
