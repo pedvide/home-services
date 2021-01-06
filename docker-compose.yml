@@ -63,3 +63,11 @@ services:
     depends_on:
       - influxdb
       - telegraf
+
+  duckdns:
+    image: ghcr.io/linuxserver/duckdns
+    environment:
+      - TZ=Europe/Amsterdam
+      - SUBDOMAINS=pedvide
+      - TOKEN=709d04ac-8097-4bba-9047-52180af896b3
+    restart: unless-stopped

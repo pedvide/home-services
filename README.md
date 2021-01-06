@@ -111,7 +111,7 @@ Use the docker gid to be able to access the docker socket
 
 ```bash
 docker run -d --user "$(id -u telegraf)":"$(getent group docker | cut -d: -f3)" --name=telegraf \
- --net influxdb --restart=always \
+ --net influxdb --restart=unless-stopped \
  -e HOST_HOSTNAME=`hostname` \
  -e HOST_MOUNT_PREFIX=/hostfs -v /:/hostfs:ro \
  -e HOST_PROC=/hostfs/proc  \
@@ -147,7 +147,7 @@ sudo chown grafana:grafana /var/lib/grafana
 
 ```bash
 docker run -d --name=grafana -p 3000:3000 --net influxdb \
---restart=always \
+--restart=unless-stopped \
  -v "/var/lib/grafana/:/var/lib/grafana" \
  -e GF_DISABLE_INITIAL_ADMIN_CREATION=true \
  -e GF_SECURITY_ADMIN_USER=admin -e GF_SECURITY_ADMIN_PASSWORD=grafana123 \
@@ -192,5 +192,16 @@ docker build -t speedtest -f speedtest.Dockerfile .
 Run:
 
 ```bash
-docker run -d --restart=always --name speedtest --net telegraf speedtest
+docker run -d --restart=unless-stopped --name speedtest --net telegraf speedtest
+```
+
+## duckdns
+
+```bash
+docker run -d --name=duckdns \
+  -e TZ=Europe/Amsterdam \
+  -e SUBDOMAINS=pedvide \
+  -e TOKEN=709d04ac-8097-4bba-9047-52180af896b3 \
+  --restart unless-stopped \
+  ghcr.io/linuxserver/duckdns
 ```
