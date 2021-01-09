@@ -1,26 +1,19 @@
-FROM debian:buster-slim
+FROM msoap/shell2http
 
-ENV INSTALL_KEY=379CE192D401AB61
-ENV DEB_DISTRO=bionic
+# Speedtest Version
+ARG SPEEDTEST_VERSION=1.0.0
+# Set tarball file URL
+ARG TARBALL_URL=https://bintray.com/ookla/download/download_file?file_path=ookla-speedtest-${SPEEDTEST_VERSION}-x86_64-linux.tgz
 
-RUN apt update && apt install -y \
-    gnupg1 apt-transport-https dirmngr wget \
-    && rm -rf /var/lib/apt/lists/*
 
-RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys $INSTALL_KEY
-RUN echo "deb https://ookla.bintray.com/debian ${DEB_DISTRO} main" >> /etc/apt/sources.list.d/speedtest.list
-RUN apt update && apt install -y \
-    speedtest \
-    && rm -rf /var/lib/apt/lists/*
-
-RUN wget 'https://github.com/msoap/shell2http/releases/download/1.13/shell2http-1.13.linux.amd64.tar.gz' \
-    && tar -xvf shell2http-1.13.linux.amd64.tar.gz \
-    && rm LICENSE README.md shell2http.1 \
-    && chmod +x shell2http
+RUN apk add --no-cache ca-certificates tar tzdata wget \
+    && wget -qO- ${TARBALL_URL} | tar -xz -C ./ \
+    && apk del tar wget && rm -rf /var/cache/apk/* \
+    && chmod +x speedtest && mv speedtest /usr/bin/speedtest
 
 RUN speedtest --accept-gdpr --accept-license
 #CMD shell2http -cgi / 'echo "Content-Type: application/json"; echo; echo "{\"date\": \"$(date)\"}"'
 ENV SPEEDTEST="speedtest --accept-license --accept-gdpr -f json 2> /dev/null"
-RUN echo "$(SPEEDTEST)"
-CMD ./shell2http -cgi / 'echo "Content-Type: application/json"; echo; echo "${SPEEDTEST}"'
+#CMD ./shell2http -cgi / 'echo "Content-Type: application/json\n"; echo $(${SPEEDTEST})'
+CMD ["-cgi", "/", "echo \"Content-Type: application/json\n\"; speedtest --accept-license --accept-gdpr -f json 2> /dev/null"]
 
