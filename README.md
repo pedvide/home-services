@@ -148,7 +148,7 @@ sudo chown grafana:grafana /var/lib/grafana
 ```bash
 docker run -d --name=grafana -p 3000:3000 --net influxdb \
 --restart=unless-stopped \
- -v "/var/lib/grafana/:/var/lib/grafana" \
+ -v "$(pwd)/grafana/data/var/lib/grafana/:/var/lib/grafana" \
  -e GF_DISABLE_INITIAL_ADMIN_CREATION=true \
  -e GF_SECURITY_ADMIN_USER=admin -e GF_SECURITY_ADMIN_PASSWORD=grafana123 \
  -e GF_DATE_FORMATS_INTERVAL_DAY='DD/MM' -e GF_DATE_FORMATS_INTERVAL_HOUR='DD/MM HH:mm' \

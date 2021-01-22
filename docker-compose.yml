@@ -54,7 +54,7 @@ services:
       - GF_DATE_FORMATS_INTERVAL_DAY='DD/MM'
       - GF_DATE_FORMATS_INTERVAL_HOUR='DD/MM HH:mm'
     volumes:
-      - /var/lib/grafana/:/var/lib/grafana
+      - ./grafana/data/var/lib/grafana:/var/lib/grafana
     ports:
       - "3000:3000"
     networks:
