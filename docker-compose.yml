@@ -76,3 +76,17 @@ services:
       # TOKEN=$(cat duckdns/token | tr -d "\n")
       - TOKEN
     restart: unless-stopped
+
+  traefik:
+    image: "traefik"
+    container_name: "traefik"
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+    ports:
+      - "800:80"
+      - "8080:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"

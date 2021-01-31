@@ -205,3 +205,10 @@ docker run -d --name=duckdns \
   --restart unless-stopped \
   ghcr.io/linuxserver/duckdns
 ```
+
+## traefik
+
+```bash
+docker run -it -d --name traefik -p 800:80 -p 8080:8080 -v /var/run/docker.sock:/var/run/docker.sock:ro \
+  traefik --api.insecure=true --providers.docker=true --providers.docker.exposedbydefault=false --entrypoints.web.address=:80
+```
