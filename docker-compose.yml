@@ -16,6 +16,7 @@ services:
     networks:
       - influxdb
     user: "${INFLUX_UID}:${INFLUX_GID}"
+    restart: unless-stopped
 
   telegraf:
     image: telegraf
@@ -35,6 +36,7 @@ services:
     user: "${TELEGRAF_UID}:${TELEGRAF_GID}"
     depends_on:
       - influxdb
+    restart: unless-stopped
 
   speedtest:
     build:
@@ -44,6 +46,7 @@ services:
       - telegraf
     depends_on:
       - telegraf
+    restart: unless-stopped
 
   grafana:
     image: grafana/grafana
@@ -63,6 +66,7 @@ services:
     depends_on:
       - influxdb
       - telegraf
+    restart: unless-stopped
 
   duckdns:
     image: ghcr.io/linuxserver/duckdns
