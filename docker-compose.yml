@@ -57,16 +57,26 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=grafana123
       - GF_DATE_FORMATS_INTERVAL_DAY='DD/MM'
       - GF_DATE_FORMATS_INTERVAL_HOUR='DD/MM HH:mm'
+      - GF_SERVER_ROOT_URL=%(protocol)s://%(domain)s/grafana
+     user: "995:995"
     volumes:
       - ./grafana/data/var/lib/grafana:/var/lib/grafana
     ports:
       - "3000:3000"
     networks:
       - influxdb
-    user: "${GRAFANA_UID}:${GRAFANA_GID}"
+      - traefik
     depends_on:
       - influxdb
-      - telegraf
+      - traefik
+    labels:
+      - "traefik.enable=true"
+      - "traefik.port=3000"
+      - "traefik.http.routers.grafana.rule=PathPrefix(`/grafana`)"
+      - "traefik.docker.network=traefik"
+      - "traefik.http.routers.grafana.middlewares=grafana-stripprefix"
+      - "traefik.http.middlewares.grafana-stripprefix.stripprefix.prefixes=/grafana"
+      - "traefik.docker.network=traefik"
     restart: unless-stopped
 
   duckdns:
