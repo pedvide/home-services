@@ -1,15 +1,21 @@
 version: "3.8"
 networks:
   influxdb:
+      name: influxdb
   telegraf:
+      name: telegraf
   traefik:
+      name: traefik
 
 services:
   influxdb:
     image: influxdb
+    container_name: influxdb
     environment:
       - INFLUXDB_REPORTING_DISABLED=true
       - INFLUXDB_HTTP_AUTH_ENABLED=true
+      - INFLUXDB_ADMIN_USER=influx_admin
+      - INFLUXDB_ADMIN_PASSWORD=influx_admin123
     volumes:
       - /var/lib/influxdb:/var/lib/influxdb
     ports:
@@ -58,7 +64,7 @@ services:
       - GF_DATE_FORMATS_INTERVAL_DAY='DD/MM'
       - GF_DATE_FORMATS_INTERVAL_HOUR='DD/MM HH:mm'
       - GF_SERVER_ROOT_URL=%(protocol)s://%(domain)s/grafana
-     user: "995:995"
+    user: "995:995"
     volumes:
       - ./grafana/data/var/lib/grafana:/var/lib/grafana
     ports:
@@ -73,7 +79,6 @@ services:
       - "traefik.enable=true"
       - "traefik.port=3000"
       - "traefik.http.routers.grafana.rule=PathPrefix(`/grafana`)"
-      - "traefik.docker.network=traefik"
       - "traefik.http.routers.grafana.middlewares=grafana-stripprefix"
       - "traefik.http.middlewares.grafana-stripprefix.stripprefix.prefixes=/grafana"
       - "traefik.docker.network=traefik"
@@ -84,23 +89,22 @@ services:
     environment:
       - TZ=Europe/Amsterdam
       - SUBDOMAINS=pedvide
-      # TOKEN=$(cat duckdns/token | tr -d "\n")
-      - TOKEN
+      - TOKEN=${DUCKDNS_TOKEN}
     restart: unless-stopped
 
   traefik:
     image: "traefik"
-    container_name: "traefik"
     command:
       - "--api.insecure=true"
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.web.address=:80"
     ports:
-      - "800:80"
+      - "80:80"
       - "8080:8080"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
     networks:
       - traefik
+    restart: unless-stopped
 

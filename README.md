@@ -119,7 +119,7 @@ docker run -d --user "$(id -u telegraf)":"$(getent group docker | cut -d: -f3)" 
  -e HOST_VAR=/hostfs/var \
  -v /var/run/docker.sock:/var/run/docker.sock \
  -v $(pwd)/telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro \
- telegraf-monitoring
+ telegraf
 
 docker network connect telegraf telegraf
 ```
@@ -209,6 +209,6 @@ docker run -d --name=duckdns \
 ## traefik
 
 ```bash
-docker run -it -d --name traefik -p 800:80 -p 8080:8080 -v /var/run/docker.sock:/var/run/docker.sock:ro \
+docker run -it -d --restart=unless-stopped --name traefik -p 80:80 -p 8080:8080 -v /var/run/docker.sock:/var/run/docker.sock:ro \
   traefik --api.insecure=true --providers.docker=true --providers.docker.exposedbydefault=false --entrypoints.web.address=:80
 ```
