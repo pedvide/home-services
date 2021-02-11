@@ -67,6 +67,7 @@ services:
     user: "995:995"
     volumes:
       - ./grafana/data/var/lib/grafana:/var/lib/grafana
+      - ./home_sensor/rest_server/data/:/rest_server_data:ro
     ports:
       - "3000:3000"
     networks:
