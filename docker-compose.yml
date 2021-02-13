@@ -109,3 +109,17 @@ services:
       - traefik
     restart: unless-stopped
 
+  ntp:
+    build:
+      context: ./ntp
+      dockerfile: Dockerfile
+    ports:
+      - 123:123/udp
+    volumes:
+        - ./ntp/chrony.conf:/etc/chrony/chrony.conf:ro
+    tmpfs:
+      - /etc/chrony:rw,mode=1750
+      - /run/chrony:rw,mode=1750
+      - /var/lib/chrony:rw,mode=1750
+    restart: unless-stopped
+
