@@ -108,10 +108,26 @@ services:
       - influxdb
     restart: unless-stopped
 
+  logrotate:
+    build:
+      context: ./logrotate
+      dockerfile: Dockerfile
+    container_name: logrotate
+    environment:
+      - LOGROTATE_FILE_PATTERN="*.log"
+      # don't rotate at all but truncate logs when they exceed the configured rotation size
+      - LOGROTATE_ROTATE="0"
+      - LOGROTATE_SIZE="50M"
+      - LOGROTATE_CRON="hourly"
+    volumes:
+      - ./traefik/data/log:/log
+    restart: unless-stopped
+
   ntp:
     build:
       context: ./ntp
       dockerfile: Dockerfile
+    container_name: ntp
     volumes:
         - ./ntp/chrony.conf:/etc/chrony/chrony.conf:ro
     tmpfs:
