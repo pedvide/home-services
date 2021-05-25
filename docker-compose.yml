@@ -102,7 +102,7 @@ services:
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - "./traefik/config.toml:/etc/traefik/traefik.toml:ro"
-      - "./traefik/data/log:/var/log"
+      - "./log/traefik:/var/log"
     networks:
       - traefik
       - influxdb
@@ -120,7 +120,7 @@ services:
       - LOGROTATE_SIZE="50M"
       - LOGROTATE_CRON="hourly"
     volumes:
-      - ./traefik/data/log:/log
+      - ./log:/log
     restart: unless-stopped
 
   ntp:
@@ -158,4 +158,18 @@ services:
     restart: always
     volumes:
      - ./openvpn/data/:/etc/openvpn
+
+  fail2ban:
+    image: crazymax/fail2ban:latest
+    container_name: fail2ban
+    network_mode: "host"
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    volumes:
+      - "./fail2ban/data:/data"
+      - "./log:/var/log:ro"
+    environment:
+      - TZ=Europe/Amsterdam
+    restart: unless-stopped
 
