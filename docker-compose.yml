@@ -95,24 +95,14 @@ services:
 
   traefik:
     image: "traefik"
-    command:
-      - "--api.insecure=true"
-      - "--providers.docker=true"
-      - "--providers.docker.exposedbydefault=false"
-      - "--entrypoints.web.address=:80"
-      - "--metrics=true"
-      - "--metrics.influxdb=true"
-      - "--metrics.influxdb.protocol=http"
-      - "--metrics.influxdb.address=influxdb:8086"
-      - "--metrics.influxdb.retentionPolicy=weekly"
-      - "--metrics.influxdb.database=traefik"
-      - "--metrics.influxdb.username=traefik"
-      - "--metrics.influxdb.password=traefik123"
     ports:
       - "80:80"
       - "8080:8080"
+        #- "123:123/udp"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./traefik/config.toml:/etc/traefik/traefik.toml:ro"
+      - "./traefik/data/log:/var/log"
     networks:
       - traefik
       - influxdb
@@ -122,14 +112,24 @@ services:
     build:
       context: ./ntp
       dockerfile: Dockerfile
-    ports:
-      - 123:123/udp
     volumes:
         - ./ntp/chrony.conf:/etc/chrony/chrony.conf:ro
     tmpfs:
       - /etc/chrony:rw,mode=1750
       - /run/chrony:rw,mode=1750
       - /var/lib/chrony:rw,mode=1750
+    ports:
+      - "123:123/udp"
+        #    expose:
+        #- "123/udp"
+        #labels:
+        #- "traefik.enable=true"
+        #- "traefik.port=123"
+        #- "traefik.udp.routers.ntp.entrypoints=ntp"
+        #- "traefik.udp.routers.ntp.service=ntp"
+        #- "traefik.udp.services.ntp.loadBalancer.server.port=123"
+        #networks:
+        #- traefik
     restart: unless-stopped
 
   openvpn:

@@ -1,0 +1,29 @@
+[global]
+  checkNewVersion = false
+  sendAnonymousUsage = false
+
+[log]
+  level = "INFO"
+
+[accessLog]
+  filePath = "/var/log/access.log"
+
+[entryPoints] # Creating an entrypoint listening on port 80 with the default protocol of TCP
+  [entryPoints.web]
+    address = ":80"
+
+[api]
+  insecure = true # Enables the web UI
+
+[providers.docker]
+  exposedByDefault = false
+
+[metrics]
+  [metrics.influxDB]
+    address = "influxdb:8086"
+    protocol = "http"
+    database = "traefik"
+    retentionPolicy = "weekly"
+    username = "traefik"
+    password = "traefik123"
+
