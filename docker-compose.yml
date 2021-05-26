@@ -153,11 +153,12 @@ services:
      - NET_ADMIN
     image: kylemanna/openvpn
     container_name: openvpn
+    volumes:
+      - "./log/openvpn:/var/log"
+      - "./openvpn/data/:/etc/openvpn"
     ports:
      - "1194:1194/udp"
     restart: always
-    volumes:
-     - ./openvpn/data/:/etc/openvpn
 
   fail2ban:
     image: crazymax/fail2ban:latest
