@@ -12,6 +12,12 @@
   [entryPoints.web]
     address = ":80"
 
+  [entryPoints.wireguard]
+    address = ":51820/udp"
+
+  [entryPoints.ntp]
+    address = ":123/udp"
+
 [api]
   insecure = true # Enables the web UI
 

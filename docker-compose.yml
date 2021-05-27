@@ -9,7 +9,7 @@ networks:
 
 services:
   influxdb:
-    image: influxdb
+    image: influxdb:1.8
     container_name: influxdb
     environment:
       - INFLUXDB_REPORTING_DISABLED=true
@@ -103,7 +103,7 @@ services:
     ports:
       - "80:80"
       - "8080:8080"
-        #- "123:123/udp"
+      - "51820:51820/udp"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - "./traefik/config.toml:/etc/traefik/traefik.toml:ro"
@@ -141,29 +141,7 @@ services:
       - /var/lib/chrony:rw,mode=1750
     ports:
       - "123:123/udp"
-        #    expose:
-        #- "123/udp"
-        #labels:
-        #- "traefik.enable=true"
-        #- "traefik.port=123"
-        #- "traefik.udp.routers.ntp.entrypoints=ntp"
-        #- "traefik.udp.routers.ntp.service=ntp"
-        #- "traefik.udp.services.ntp.loadBalancer.server.port=123"
-        #networks:
-        #- traefik
     restart: unless-stopped
-
-  openvpn:
-    cap_add:
-     - NET_ADMIN
-    image: kylemanna/openvpn
-    container_name: openvpn
-    volumes:
-      - "./log/openvpn:/var/log"
-      - "./openvpn/data/:/etc/openvpn"
-    ports:
-     - "1194:1194/udp"
-    restart: always
 
   fail2ban:
     image: crazymax/fail2ban:latest
@@ -194,12 +172,18 @@ services:
       - PEERS=surface-tablet,smartphone #optional
       - PEERDNS=192.168.2.254 #optional
       - ALLOWEDIPS=192.168.2.0/24 #optional
+    networks:
+      - traefik
     volumes:
       - ./wireguard/data:/config
       - /lib/modules:/lib/modules
-    ports:
-      - 51820:51820/udp
     sysctls:
       - net.ipv4.conf.all.src_valid_mark=1
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik"
+      - "traefik.udp.routers.wireguard-udp.entrypoints=wireguard"
+      - "traefik.udp.routers.wireguard-udp.service=wireguard-udp-svc"
+      - "traefik.udp.services.wireguard-udp-svc.loadbalancer.server.port=51820"
     restart: unless-stopped
 
