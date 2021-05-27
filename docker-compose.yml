@@ -169,7 +169,8 @@ services:
       - NET_RAW
     volumes:
       - "./fail2ban/data:/data"
-      - "./log:/var/log:ro"
+      - "./log:/var/log/containers:ro"
+      - "/var/log:/var/log/host:ro"
     environment:
       - TZ=Europe/Amsterdam
     restart: unless-stopped
