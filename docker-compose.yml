@@ -27,6 +27,7 @@ services:
 
   telegraf:
     image: telegraf
+    container_name: telegraf
     environment:
       - HOST_HOSTNAME=${TELEGRAF_HOSTNAME}
       - HOST_MOUNT_PREFIX=/hostfs
@@ -49,6 +50,7 @@ services:
     build:
       context: ./speedtest
       dockerfile: speedtest.Dockerfile
+    container_name: speedtest
     networks:
       - telegraf
     depends_on:
@@ -57,6 +59,7 @@ services:
 
   grafana:
     image: grafana/grafana
+    container_name: grafana
     environment:
       - GF_DISABLE_INITIAL_ADMIN_CREATION=true
       - GF_SECURITY_ADMIN_USER=admin
@@ -87,6 +90,7 @@ services:
 
   duckdns:
     image: ghcr.io/linuxserver/duckdns
+    container_name: duckdns
     environment:
       - TZ=Europe/Amsterdam
       - SUBDOMAINS=pedvide
@@ -95,6 +99,7 @@ services:
 
   traefik:
     image: "traefik"
+    container_name: traefik
     ports:
       - "80:80"
       - "8080:8080"
