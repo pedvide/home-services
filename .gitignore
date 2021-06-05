@@ -4,4 +4,4 @@ certificates/
 
 duckdns/token
 .env
-openvpn/
+influxdb/config/

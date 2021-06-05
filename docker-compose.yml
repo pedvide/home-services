@@ -2,6 +2,8 @@ version: "3.8"
 networks:
   influxdb:
       name: influxdb
+  influxdb2:
+      name: influxdb2
   telegraf:
       name: telegraf
   traefik:
@@ -22,6 +24,19 @@ services:
       - "8086:8086"
     networks:
       - influxdb
+    user: "${INFLUX_UID}:${INFLUX_GID}"
+    restart: unless-stopped
+
+  influxdb2:
+    image: influxdb:2.0
+    container_name: influxdb2
+    volumes:
+      - ./influxdb/data:/var/lib/influxdb2
+      - ./influxdb/config:/etc/influxdb2
+    ports:
+      - "9086:8086"
+    networks:
+      - influxdb2
     user: "${INFLUX_UID}:${INFLUX_GID}"
     restart: unless-stopped
 

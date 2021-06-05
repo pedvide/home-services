@@ -27,6 +27,7 @@
 [metrics]
   [metrics.influxDB]
     address = "http://influxdb:8086"
+    #address = "http://telegraf:8081"
     protocol = "http"
     database = "traefik"
     retentionPolicy = "weekly"
