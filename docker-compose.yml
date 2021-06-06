@@ -96,10 +96,10 @@ services:
       - traefik
     labels:
       - "traefik.enable=true"
-      - "traefik.port=3000"
       - "traefik.http.routers.grafana.rule=PathPrefix(`/grafana`)"
       - "traefik.http.routers.grafana.middlewares=grafana-stripprefix"
       - "traefik.http.middlewares.grafana-stripprefix.stripprefix.prefixes=/grafana"
+      - "traefik.http.routers.grafana.entrypoints=web"
       - "traefik.docker.network=traefik"
     restart: unless-stopped
 
@@ -117,12 +117,14 @@ services:
     container_name: traefik
     ports:
       - "80:80"
+      - "443:443"
       - "8080:8080"
       - "51820:51820/udp"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "./traefik/config.toml:/etc/traefik/traefik.toml:ro"
+      - "./traefik/traefik.toml:/etc/traefik/traefik.toml:ro"
       - "./log/traefik:/var/log"
+      - "./traefik/certificates:/certificates"
     networks:
       - traefik
       - influxdb
@@ -140,7 +142,7 @@ services:
       - LOGROTATE_SIZE="50M"
       - LOGROTATE_CRON="hourly"
     volumes:
-      - ./log:/log
+      - ./log:/logs
     restart: unless-stopped
 
   ntp:

@@ -12,17 +12,21 @@
   [entryPoints.web]
     address = ":80"
 
+  [entryPoints.websecure]
+    address = ":443"
+
   [entryPoints.wireguard]
     address = ":51820/udp"
-
-  [entryPoints.ntp]
-    address = ":123/udp"
 
 [api]
   insecure = true # Enables the web UI
 
-[providers.docker]
-  exposedByDefault = false
+[providers]
+  [providers.docker]
+    exposedByDefault = false
+
+  [providers.file]
+    directory = "/certificates"
 
 [metrics]
   [metrics.influxDB]
