@@ -2,8 +2,6 @@ version: "3.8"
 networks:
   influxdb:
       name: influxdb
-  influxdb2:
-      name: influxdb2
   telegraf:
       name: telegraf
   traefik:
@@ -11,32 +9,15 @@ networks:
 
 services:
   influxdb:
-    image: influxdb:1.8
-    container_name: influxdb
-    environment:
-      - INFLUXDB_REPORTING_DISABLED=true
-      - INFLUXDB_HTTP_AUTH_ENABLED=true
-      - INFLUXDB_ADMIN_USER=influx_admin
-      - INFLUXDB_ADMIN_PASSWORD=influx_admin123
-    volumes:
-      - /var/lib/influxdb:/var/lib/influxdb
-    ports:
-      - "8086:8086"
-    networks:
-      - influxdb
-    user: "${INFLUX_UID}:${INFLUX_GID}"
-    restart: unless-stopped
-
-  influxdb2:
     image: influxdb:2.0
-    container_name: influxdb2
+    container_name: influxdb
     volumes:
       - ./influxdb/data:/var/lib/influxdb2
       - ./influxdb/config:/etc/influxdb2
     ports:
-      - "9086:8086"
+      - "8086:8086"
     networks:
-      - influxdb2
+      - influxdb
     user: "${INFLUX_UID}:${INFLUX_GID}"
     restart: unless-stopped
 
@@ -49,10 +30,13 @@ services:
       - HOST_PROC=/hostfs/proc
       - HOST_SYS=/hostfs/sys
       - HOST_VAR=/hostfs/var
+      - TELEGRAF_INFLUXDB_TOKEN=${TELEGRAF_INFLUXDB_TOKEN}
     volumes:
       - /:/hostfs:ro
       - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
       - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - "8081:8081"
     networks:
       - influxdb
       - telegraf
@@ -127,7 +111,8 @@ services:
       - "./traefik/certificates:/certificates"
     networks:
       - traefik
-      - influxdb
+        #- influxdb
+      - telegraf
     restart: unless-stopped
 
   logrotate:
@@ -136,11 +121,11 @@ services:
       dockerfile: Dockerfile
     container_name: logrotate
     environment:
-      - LOGROTATE_FILE_PATTERN="*.log"
+      - LOGROTATE_FILE_PATTERN=*.log
       # don't rotate at all but truncate logs when they exceed the configured rotation size
-      - LOGROTATE_ROTATE="0"
-      - LOGROTATE_SIZE="50M"
-      - LOGROTATE_CRON="hourly"
+      - LOGROTATE_ROTATE=0
+      - LOGROTATE_SIZE=50M
+      - LOGROTATE_CRON=daily
     volumes:
       - ./log:/logs
     restart: unless-stopped
