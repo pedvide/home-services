@@ -63,8 +63,8 @@ services:
       - GF_DISABLE_INITIAL_ADMIN_CREATION=true
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=grafana123
-      - GF_DATE_FORMATS_INTERVAL_DAY='DD/MM'
-      - GF_DATE_FORMATS_INTERVAL_HOUR='DD/MM HH:mm'
+      - GF_DATE_FORMATS_INTERVAL_DAY=DD/MM
+      - GF_DATE_FORMATS_INTERVAL_HOUR=DD/MM HH:mm
       - GF_SERVER_ROOT_URL=%(protocol)s://%(domain)s/grafana
     user: "995:995"
     volumes:
